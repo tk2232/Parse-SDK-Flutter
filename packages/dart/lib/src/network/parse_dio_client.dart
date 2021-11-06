@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 
 import 'dio_adapter_io.dart' if (dart.library.js) 'dio_adapter_js.dart';
@@ -12,6 +13,13 @@ class ParseDioClient extends ParseClient {
       sendSessionId: sendSessionId,
       securityContext: securityContext,
     );
+    _client.interceptors.add(RetryInterceptor(
+      dio: _client,
+      logPrint: print, // specify log function (optional)
+      retries: 3, // retry count (optional)
+      retryDelays:
+          List<Duration>.generate(1000, (int index) => Duration(seconds: 1)),
+    ));
   }
 
   late _ParseDioClient _client;
@@ -128,7 +136,8 @@ class ParseDioClient extends ParseClient {
 
 /// Creates a custom version of HTTP Client that has Parse Data Preset
 class _ParseDioClient with dio.DioMixin implements dio.Dio {
-  _ParseDioClient({bool sendSessionId = false, SecurityContext? securityContext})
+  _ParseDioClient(
+      {bool sendSessionId = false, SecurityContext? securityContext})
       : _sendSessionId = sendSessionId {
     options = dio.BaseOptions();
     httpClientAdapter = createHttpClientAdapter(securityContext);
@@ -168,8 +177,8 @@ class _ParseDioClient with dio.DioMixin implements dio.Dio {
 
     /// If developer wants to add custom headers, extend this class and add headers needed.
     if (additionalHeaders != null && additionalHeaders!.isNotEmpty) {
-      additionalHeaders!
-          .forEach((String key, String value) => options!.headers![key] = value);
+      additionalHeaders!.forEach(
+          (String key, String value) => options!.headers![key] = value);
     }
 
     if (parseCoreData.debug) {
