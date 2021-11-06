@@ -18,7 +18,8 @@ class ParseHTTPClient extends ParseClient {
 
   late _ParseHTTPClient _client;
 
-  final retryOptions = RetryOptions(maxAttempts: 100, maxDelay: Duration(seconds: 5));
+  final retryOptions =
+      RetryOptions(maxAttempts: 100, maxDelay: Duration(seconds: 5));
 
   Map<String, String>? get additionalHeaders => _client.additionalHeaders;
 
@@ -51,7 +52,7 @@ class ParseHTTPClient extends ParseClient {
     ParseNetworkOptions? options,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final http.Response response = await retryOptions.retry((
+    final http.Response response = await retryOptions.retry(
       () => _client
           .get(
             Uri.parse(path),
@@ -71,7 +72,7 @@ class ParseHTTPClient extends ParseClient {
     String? data,
     ParseNetworkOptions? options,
   }) async {
-    final http.Response response = await retryOptions.retry((
+    final http.Response response = await retryOptions.retry(
       () => _client
           .put(
             Uri.parse(path),
@@ -92,7 +93,7 @@ class ParseHTTPClient extends ParseClient {
     String? data,
     ParseNetworkOptions? options,
   }) async {
-    final http.Response response = await retryOptions.retry((
+    final http.Response response = await retryOptions.retry(
       () => _client
           .post(
             Uri.parse(path),
@@ -114,7 +115,7 @@ class ParseHTTPClient extends ParseClient {
     ParseNetworkOptions? options,
     ProgressCallback? onSendProgress,
   }) async {
-    final http.Response response = await retryOptions.retry((
+    final http.Response response = await retryOptions.retry(
       () async => _client
           .post(
             Uri.parse(path),
@@ -136,7 +137,7 @@ class ParseHTTPClient extends ParseClient {
   @override
   Future<ParseNetworkResponse> delete(String path,
       {ParseNetworkOptions? options}) async {
-    final http.Response response = await retryOptions.retry((
+    final http.Response response = await retryOptions.retry(
       () => _client
           .delete(
             Uri.parse(path),
