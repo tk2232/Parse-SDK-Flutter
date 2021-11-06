@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
+import 'package:retry/retry.dart';
 
 class ParseHTTPClient extends ParseClient {
   ParseHTTPClient(
@@ -27,9 +29,15 @@ class ParseHTTPClient extends ParseClient {
     ParseNetworkOptions? options,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final http.Response response = await _client.get(
-      Uri.parse(path),
-      headers: options?.headers,
+    final http.Response response = await retry(
+      () => _client
+          .get(
+            Uri.parse(path),
+            headers: options?.headers,
+          )
+          .timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
     );
     return ParseNetworkResponse(
         data: response.body, statusCode: response.statusCode);
@@ -41,9 +49,15 @@ class ParseHTTPClient extends ParseClient {
     ParseNetworkOptions? options,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final http.Response response = await _client.get(
-      Uri.parse(path),
-      headers: options?.headers,
+    final http.Response response = await retry(
+      () => _client
+          .get(
+            Uri.parse(path),
+            headers: options?.headers,
+          )
+          .timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
     );
     return ParseNetworkByteResponse(
         bytes: response.bodyBytes, statusCode: response.statusCode);
@@ -55,10 +69,16 @@ class ParseHTTPClient extends ParseClient {
     String? data,
     ParseNetworkOptions? options,
   }) async {
-    final http.Response response = await _client.put(
-      Uri.parse(path),
-      body: data,
-      headers: options?.headers,
+    final http.Response response = await retry(
+      () => _client
+          .put(
+            Uri.parse(path),
+            body: data,
+            headers: options?.headers,
+          )
+          .timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
     );
     return ParseNetworkResponse(
         data: response.body, statusCode: response.statusCode);
@@ -70,10 +90,16 @@ class ParseHTTPClient extends ParseClient {
     String? data,
     ParseNetworkOptions? options,
   }) async {
-    final http.Response response = await _client.post(
-      Uri.parse(path),
-      body: data,
-      headers: options?.headers,
+    final http.Response response = await retry(
+      () => _client
+          .post(
+            Uri.parse(path),
+            body: data,
+            headers: options?.headers,
+          )
+          .timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
     );
     return ParseNetworkResponse(
         data: response.body, statusCode: response.statusCode);
@@ -86,12 +112,20 @@ class ParseHTTPClient extends ParseClient {
     ParseNetworkOptions? options,
     ProgressCallback? onSendProgress,
   }) async {
-    final http.Response response = await _client.post(
-      Uri.parse(path),
-      //Convert the stream to a list
-      body: await data?.fold<List<int>>(<int>[],
-          (List<int> previous, List<int> element) => previous..addAll(element)),
-      headers: options?.headers,
+    final http.Response response = await retry(
+      () async => _client
+          .post(
+            Uri.parse(path),
+            //Convert the stream to a list
+            body: await data?.fold<List<int>>(
+                <int>[],
+                (List<int> previous, List<int> element) =>
+                    previous..addAll(element)),
+            headers: options?.headers,
+          )
+          .timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
     );
     return ParseNetworkResponse(
         data: response.body, statusCode: response.statusCode);
@@ -100,9 +134,15 @@ class ParseHTTPClient extends ParseClient {
   @override
   Future<ParseNetworkResponse> delete(String path,
       {ParseNetworkOptions? options}) async {
-    final http.Response response = await _client.delete(
-      Uri.parse(path),
-      headers: options?.headers,
+    final http.Response response = await retry(
+      () => _client
+          .delete(
+            Uri.parse(path),
+            headers: options?.headers,
+          )
+          .timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
     );
     return ParseNetworkResponse(
         data: response.body, statusCode: response.statusCode);

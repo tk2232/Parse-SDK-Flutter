@@ -12,6 +12,7 @@ dependencies:
   http: ^0.13.3
   web_socket_channel: ^2.1.0
   dio_smart_retry: ^1.0.3
+  retry: ^3.1.0
 
   #Database
   sembast: ^3.1.0+2
