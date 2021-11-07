@@ -13,13 +13,13 @@ class ParseDioClient extends ParseClient {
       sendSessionId: sendSessionId,
       securityContext: securityContext,
     );
-    _client.interceptors.add(RetryInterceptor(
-      dio: _client,
-      logPrint: print, // specify log function (optional)
-      retries: 3, // retry count (optional)
-      retryDelays:
-          List<Duration>.generate(1000, (int index) => Duration(seconds: 1)),
-    ));
+    // _client.interceptors.add(RetryInterceptor(
+    //   dio: _client,
+    //   logPrint: print, // specify log function (optional)
+    //   retries: 3, // retry count (optional)
+    //   retryDelays:
+    //       List<Duration>.generate(1000, (int index) => Duration(seconds: 1)),
+    // ));
   }
 
   late _ParseDioClient _client;
