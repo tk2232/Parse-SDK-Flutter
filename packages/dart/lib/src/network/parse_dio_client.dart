@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 
 import 'dio_adapter_io.dart' if (dart.library.js) 'dio_adapter_js.dart';
@@ -12,13 +13,13 @@ class ParseDioClient extends ParseClient {
       sendSessionId: sendSessionId,
       securityContext: securityContext,
     );
-    // _client.interceptors.add(RetryInterceptor(
-    //   dio: _client,
-    //   logPrint: print, // specify log function (optional)
-    //   retries: 3, // retry count (optional)
-    //   retryDelays:
-    //       List<Duration>.generate(1000, (int index) => Duration(seconds: 1)),
-    // ));
+    _client.interceptors.add(RetryInterceptor(
+      dio: _client,
+      logPrint: print, // specify log function (optional)
+      retries: 1000, // retry count (optional)
+      retryDelays:
+          List<Duration>.generate(1000, (int index) => Duration(seconds: 1)),
+    ));
   }
 
   late _ParseDioClient _client;
